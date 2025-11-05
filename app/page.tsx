@@ -1,39 +1,54 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import StoryList from '../components/StoryList'
 import StoryViewer from '../components/StoryViewer'
-import { loadStoriesFromStorage, saveStoryToStorage, cleanupExpired, Story } from '../lib/storage'
+import {
+  loadStoriesFromStorage,
+  saveStoryToStorage,
+  cleanupExpired,
+} from '../lib/storage'
+
+// Define the Story interface
+export interface Story {
+  id: string
+  image: string
+  createdAt: number
+}
 
 export default function Home() {
+  // This line is correct and explicitly types the state
   const [stories, setStories] = useState<Story[]>([])
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
 
   useEffect(() => {
     cleanupExpired()
-    setStories(loadStoriesFromStorage())
+    const storedStories: Story[] = loadStoriesFromStorage()
+    setStories(storedStories)
 
     const onStorage = () => setStories(loadStoriesFromStorage())
     window.addEventListener('storage', onStorage)
     return () => window.removeEventListener('storage', onStorage)
   }, [])
 
-  const handleAddImage = async (file: File | null) => {
+  const handleAddImage = async (file: File | null): Promise<void> => {
     if (!file) return
     await saveStoryToStorage(file)
     setStories(loadStoriesFromStorage())
   }
 
-  const handleOpenViewer = (index: number) => {
+  const handleOpenViewer = (index: number): void => {
     setActiveIndex(index)
   }
 
-  const handleCloseViewer = () => {
+  const handleCloseViewer = (): void => {
     setActiveIndex(null)
   }
 
-  const handleDeleteStory = (id: string) => {
-    const all = loadStoriesFromStorage().filter((s) => s.id !== id)
+  const handleDeleteStory = (id: string): void => {
+    const all: Story[] = (loadStoriesFromStorage() as Story[]).filter(
+      (s: Story) => s.id !== id,
+    )
     localStorage.setItem('stories', JSON.stringify(all))
     setStories(all)
     handleCloseViewer()

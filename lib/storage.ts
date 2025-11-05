@@ -1,12 +1,10 @@
-// lib/storage.ts
 export interface Story {
   id: string
   image: string
   createdAt: number
 }
 
-// remove expired stories
-export function cleanupExpired() {
+export function cleanupExpired(): void {
   const stories = loadStoriesFromStorage()
   const now = Date.now()
   const filtered = stories.filter((s) => now - s.createdAt < 24 * 60 * 60 * 1000)
