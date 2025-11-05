@@ -17,7 +17,6 @@ export interface Story {
 }
 
 export default function Home() {
-  // This line is correct and explicitly types the state
   const [stories, setStories] = useState<Story[]>([])
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
 
